@@ -1,0 +1,32 @@
+undm: A simple undo history manager
+-----------------------------------
+
+undm is a tool for tracking undo changes in text editors. You can think of it
+as a cross between Vim undo trees, swapfiles, and git. undm works by tracking
+individual changes to a file and flattening them when you save to disk.
+Individual saves can be tagged with a date, so you can easily revert to
+a previous save-point. When you're done editing the file, you can either remove
+part or all of the undo history, or you can keep it for the next editing
+session.
+
+undm's usage semantics and overall design is similar to git, but most of the
+similarities are conceptual and aesthetic. The file being edited is like a git
+remote, and individual edits are like commits stored in a tree structure. The
+changes are pushed to the file every time you want to save to disk. Unlike git,
+undm stores changesets, not commits and blobs, so packing and gc do not apply;
+in a sense everything is packed, because copies of the edited file are not
+individually stored per commit. Like git, undm uses branches and refs to keep
+track of the undo history, and lets you access and edit the file at different
+points in history. In the future basic tools for merging and reordering commits
+and branches will also be provided.
+
+undm is not a source repository: you should use git for that. In the future it
+will be possible to automatically sync with a git repo when you save the file
+or tag a session. An ideal workflow would be to have undm integrated in a text
+editor to track edits within a file, which using git to track the entire tree.
+
+Note that although undm is persistent on disk, it only forces an fsync when you
+explicitly save the file. If your filesystem is configured for delayed writes,
+this may result in losing edits made after the last disk write. To be safe you
+should save the file to disk fairly often. In the future it may be possible to
+configure undm to either automatically fsync at timed intervals or every edit.
